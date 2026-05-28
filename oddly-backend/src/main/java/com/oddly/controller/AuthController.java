@@ -1,0 +1,27 @@
+package com.oddly.controller;
+
+import com.oddly.dto.AuthResponse;
+import com.oddly.dto.LoginRequest;
+import com.oddly.dto.RegisterRequest;
+import com.oddly.service.AuthService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest req) {
+        return ResponseEntity.ok(authService.register(req));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
+        return ResponseEntity.ok(authService.login(req));
+    }
+}

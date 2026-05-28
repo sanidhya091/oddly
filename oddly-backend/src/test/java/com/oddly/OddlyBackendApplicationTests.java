@@ -1,0 +1,13 @@
+package com.oddly;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class OddlyBackendApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
