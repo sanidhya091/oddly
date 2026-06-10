@@ -38,7 +38,7 @@ export default function Serendipity() {
     setSavedId(null); setRevealed(false); setLoadingLine(0)
     try {
       const response = await fetch('/api/recs/serendipity', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('oddly_token')}` }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       })
       const text = await response.text()
       const parsed = JSON.parse(text.replace(/```json|```/g, "").trim())

@@ -93,7 +93,7 @@ export default function Results() {
       const isGet = mode === 'serendipity'
       const res = await fetch(endpoint, {
         method: isGet ? 'GET' : 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('oddly_token')}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
         ...(isGet ? {} : { body: JSON.stringify({ answers }) }),
       })
       if (!res.ok) { if (res.status === 401) navigate('/login'); throw new Error(`${res.status}`) }

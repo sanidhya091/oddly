@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import Home from './pages/Home'
 import Quiz from './pages/Quiz'
@@ -19,9 +19,13 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+
+        {/* Public */}
         <Route path="/login" element={
           <PageTransition><Login /></PageTransition>
         } />
+
+        {/* Protected */}
         <Route path="/" element={
           <ProtectedRoute><PageTransition><Home /></PageTransition></ProtectedRoute>
         } />
@@ -32,8 +36,8 @@ function AnimatedRoutes() {
           <ProtectedRoute><PageTransition><Results /></PageTransition></ProtectedRoute>
         } />
         <Route path="/detail" element={
-  <ProtectedRoute><PageTransition><Detail /></PageTransition></ProtectedRoute>
-} />
+          <ProtectedRoute><PageTransition><Detail /></PageTransition></ProtectedRoute>
+        } />
         <Route path="/profile" element={
           <ProtectedRoute><PageTransition><Profile /></PageTransition></ProtectedRoute>
         } />
@@ -46,6 +50,10 @@ function AnimatedRoutes() {
         <Route path="/chat" element={
           <ProtectedRoute><PageTransition><ChatMode /></PageTransition></ProtectedRoute>
         } />
+
+        {/* Catch-all → login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+
       </Routes>
     </AnimatePresence>
   )

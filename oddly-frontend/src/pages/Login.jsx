@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "../services/auth";
 
 // ── Particle canvas background ──────────────────────────────────────────────
 function ParticleCanvas() {
@@ -120,17 +121,10 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
-      localStorage.setItem("token", data.token);
+      await loginUser(loginEmail, loginPassword);
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -141,21 +135,10 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: regName,
-          email: regEmail,
-          password: regPassword,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Registration failed");
-      localStorage.setItem("token", data.token);
+      await registerUser(regName, regEmail, regPassword);
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }

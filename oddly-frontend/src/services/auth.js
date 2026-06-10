@@ -1,12 +1,15 @@
 import { login, register, saveToken } from './api'
 
+const TOKEN_KEY = 'token'
+const USER_KEY  = 'oddly_user'
+
 export const loginUser = async (email, password) => {
   const data = await login({ email, password })
   saveToken(data.token)
-  localStorage.setItem('oddly_user', JSON.stringify({
-    id: data.id,
-    name: data.name,
-    email: data.email,
+  localStorage.setItem(USER_KEY, JSON.stringify({
+    id:     data.id,
+    name:   data.name,
+    email:  data.email,
     handle: data.handle,
   }))
   return data
@@ -15,23 +18,23 @@ export const loginUser = async (email, password) => {
 export const registerUser = async (name, email, password) => {
   const data = await register({ name, email, password })
   saveToken(data.token)
-  localStorage.setItem('oddly_user', JSON.stringify({
-    id: data.id,
-    name: data.name,
-    email: data.email,
+  localStorage.setItem(USER_KEY, JSON.stringify({
+    id:     data.id,
+    name:   data.name,
+    email:  data.email,
     handle: data.handle,
   }))
   return data
 }
 
 export const getUser = () => {
-  const u = localStorage.getItem('oddly_user')
+  const u = localStorage.getItem(USER_KEY)
   return u ? JSON.parse(u) : null
 }
 
 export const logoutUser = () => {
-  localStorage.removeItem('oddly_token')
-  localStorage.removeItem('oddly_user')
+  localStorage.removeItem(TOKEN_KEY)
+  localStorage.removeItem(USER_KEY)
 }
 
-export const isAuthenticated = () => !!localStorage.getItem('oddly_token')
+export const isAuthenticated = () => !!localStorage.getItem(TOKEN_KEY)

@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { logoutUser } from '../../services/auth'
 
 const NAV_ITEMS = [
   { icon: '⌂', label: 'home',     route: '/'        },
@@ -19,13 +20,18 @@ const ROUTE_MAP = {
 }
 
 export default function BottomNav() {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate  = useNavigate()
+  const location  = useLocation()
 
   const currentBase = ROUTE_MAP[location.pathname] ||
     Object.entries(ROUTE_MAP).find(([path]) =>
       path !== '/' && location.pathname.startsWith(path)
     )?.[1] || '/'
+
+  function handleLogout() {
+    logoutUser()
+    navigate('/login')
+  }
 
   return (
     <motion.div
@@ -56,9 +62,9 @@ export default function BottomNav() {
         boxShadow: '0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03)',
         pointerEvents: 'auto',
       }}>
+
         {NAV_ITEMS.map(({ icon, label, route }) => {
           const isActive = currentBase === route
-
           return (
             <motion.button
               key={route}
@@ -134,10 +140,46 @@ export default function BottomNav() {
                   </motion.span>
                 )}
               </AnimatePresence>
-
             </motion.button>
           )
         })}
+
+        {/* Divider */}
+        <div style={{
+          width: 1,
+          height: 20,
+          background: 'rgba(255,255,255,0.08)',
+          margin: '0 4px',
+          flexShrink: 0,
+        }} />
+
+        {/* Logout */}
+        <motion.button
+          whileTap={{ scale: 0.88 }}
+          onClick={handleLogout}
+          title="Sign out"
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '8px 12px',
+            borderRadius: 99,
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <motion.span
+            animate={{ color: 'rgba(255,255,255,0.25)' }}
+            whileHover={{ color: '#D85A30' }}
+            transition={{ duration: 0.15 }}
+            style={{ fontSize: 14, lineHeight: 1, display: 'block' }}
+          >
+            ⏻
+          </motion.span>
+        </motion.button>
+
       </div>
     </motion.div>
   )
