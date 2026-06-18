@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import MoodBackground from '../components/layout/MoodBackground'
+import { getChatResponse } from '../services/api'
 
 const CATEGORY_META = {
   book:       { label: 'Book',       color: '#7F77DD', icon: '📖' },
@@ -113,21 +114,7 @@ export default function ChatMode() {
     historyRef.current = [...historyRef.current, { role: 'user', content: text }]
 
     try {
-      const res = await fetch('/api/recs/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({ messages: historyRef.current }),
-      })
-
-      if (!res.ok) {
-        if (res.status === 401) navigate('/login')
-        throw new Error(`${res.status}`)
-      }
-
-      const raw = await res.text()
+      const raw = await getChatResponse({ messages: historyRef.current })
       const clean = raw.replace(/```json|```/g, '').trim()
       const data = JSON.parse(clean)
 
@@ -140,6 +127,7 @@ export default function ChatMode() {
         recs: data.recs || [],
       }])
     } catch (err) {
+      if (err.message?.includes('401')) { navigate('/login'); return }
       setMessages(prev => [...prev, {
         id: Date.now().toString() + '_err',
         role: 'assistant',
@@ -152,7 +140,6 @@ export default function ChatMode() {
   }
 
   return (
-    // ← height:100vh + overflow:hidden — locks to viewport, no double-scrolling
     <div style={{
       height: '100vh', overflow: 'hidden',
       display: 'flex', flexDirection: 'column',
@@ -160,14 +147,12 @@ export default function ChatMode() {
     }}>
       <MoodBackground mood="chat" />
 
-      {/* zIndex wrapper — same height as viewport, flex column */}
       <div style={{
         position: 'relative', zIndex: 2,
         height: '100vh',
         display: 'flex', flexDirection: 'column',
       }}>
 
-        {/* Header — fixed height, never shrinks */}
         <div style={{
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           padding: '16px 20px',
@@ -189,7 +174,6 @@ export default function ChatMode() {
           <div style={{ width: 40 }} />
         </div>
 
-        {/* Messages — flex:1 takes all remaining space, scrolls internally */}
         <div style={{
           flex: 1, overflowY: 'auto',
           padding: '20px 16px 20px',
@@ -248,7 +232,6 @@ export default function ChatMode() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Prompt suggestions */}
         {messages.length === 1 && (
           <div style={{
             padding: '0 16px 10px',
@@ -275,7 +258,6 @@ export default function ChatMode() {
           </div>
         )}
 
-        {/* Input bar — flexShrink:0 keeps it pinned at bottom */}
         <div style={{
           borderTop: '1px solid rgba(255,255,255,0.06)',
           padding: '12px 16px 24px',

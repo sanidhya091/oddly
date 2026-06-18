@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import BottomNav from '../components/layout/BottomNav'
 import MoodBackground from '../components/layout/MoodBackground'
-import { saveItem, unsaveItem } from '../services/api'
+import { saveItem, unsaveItem, getQuizRecs, getTasteMatchRecs, getSerendipityRec } from '../services/api'
 import { useToast } from '../context/ToastContext'
 
 const CATEGORY_META = {
@@ -89,21 +89,18 @@ export default function Results() {
     const mode = searchParams.get('mode')
     const answers = JSON.parse(searchParams.get('answers') || '[]')
     try {
-      const endpoint = mode === 'quiz' ? '/api/recs/quiz' : mode === 'taste' ? '/api/recs/taste-match' : '/api/recs/serendipity'
-      const isGet = mode === 'serendipity'
-      const res = await fetch(endpoint, {
-        method: isGet ? 'GET' : 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-        ...(isGet ? {} : { body: JSON.stringify({ answers }) }),
-      })
-      if (!res.ok) { if (res.status === 401) navigate('/login'); throw new Error(`${res.status}`) }
-      const text = await res.text()
+      const text = mode === 'quiz'
+        ? await getQuizRecs({ answers })
+        : mode === 'taste'
+        ? await getTasteMatchRecs({ answers })
+        : await getSerendipityRec()
+
       const data = JSON.parse(text.replace(/```json|```/g, "").trim())
       sessionStorage.setItem('lastResults', JSON.stringify({ data, savedIds: {} }))
       setResults([]); setResetKey(k => k + 1); setResults(data); setSavedIds({})
       setLoading(false); setRevealed(true)
     } catch (err) {
-      if (err.name === 'AbortError') return
+      if (err.message?.includes('401')) { navigate('/login'); return }
       setError("something went sideways.\nthe recs couldn't load.")
       setLoading(false)
     }

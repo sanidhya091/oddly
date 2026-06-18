@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import BottomNav from '../components/layout/BottomNav'
 import MoodBackground from '../components/layout/MoodBackground'
-import { saveItem, unsaveItem } from '../services/api'
+import { saveItem, unsaveItem, getSerendipityRec } from '../services/api'
 import { useToast } from '../context/ToastContext'
 
 const CATEGORY_META = {
@@ -37,14 +37,12 @@ export default function Serendipity() {
     setLoading(true); setError(null); setItem(null)
     setSavedId(null); setRevealed(false); setLoadingLine(0)
     try {
-      const response = await fetch('/api/recs/serendipity', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      })
-      const text = await response.text()
+      const text = await getSerendipityRec()
       const parsed = JSON.parse(text.replace(/```json|```/g, "").trim())
       setItem(parsed)
       setTimeout(() => setRevealed(true), 100)
     } catch (err) {
+      if (err.message?.includes('401')) { navigate('/login'); return }
       setError("Something went wrong. Try again.")
     } finally {
       setLoading(false)
